@@ -51,7 +51,9 @@ function joiningToISO(joining: number | string): string {
   // Handle DD.MM.YY / DD/MM/YY style from salary sheet
   const m = cleaned.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
   if (m) {
-    let [, d, mo, y] = m;
+    const d = m[1];
+    const mo = m[2];
+    let y = m[3];
     if (y.length === 2) y = `20${y}`;
     // Prefer DMY when day > 12, else try as written from Excel (often MDY for US serials already converted)
     const day = Number(d);
