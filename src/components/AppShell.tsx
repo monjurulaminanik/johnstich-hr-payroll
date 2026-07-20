@@ -36,8 +36,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Image
               src="/logo-256.png"
               alt="Jhonstitch Knitting & Dyeing"
-              width={48}
-              height={48}
+              width={44}
+              height={44}
               className="brand-logo"
               priority
             />
@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={() => setOpen(false)}
             aria-label="Close menu"
           >
-            <X size={20} />
+            <X size={20} strokeWidth={1.75} />
           </button>
         </div>
 
@@ -70,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className={`nav-link ${active ? "active" : ""}`}
                 onClick={() => setOpen(false)}
               >
-                <Icon size={18} strokeWidth={1.75} />
+                <Icon size={20} strokeWidth={1.6} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -111,22 +111,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={() => setOpen(true)}
             aria-label="Open menu"
           >
-            <Menu size={22} />
+            <Menu size={22} strokeWidth={1.75} />
           </button>
           <div className="topbar-brand">
             <Image
               src="/logo-256.png"
               alt="Jhonstitch"
-              width={36}
-              height={36}
+              width={34}
+              height={34}
               className="topbar-logo"
             />
             <div className="topbar-title">
-              <span className="topbar-eyebrow">Jhonstitch Knitting & Dyeing</span>
-              <strong>People · Pay · Precision</strong>
+              <span className="topbar-eyebrow">Jhonstitch</span>
+              <strong>People & Pay</strong>
             </div>
           </div>
-          <div className="topbar-pill">202 people · Wages + Salary loaded</div>
+          <div className="topbar-pill">202 people</div>
         </header>
         <main className="page-content">{children}</main>
       </div>

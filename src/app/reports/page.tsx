@@ -19,16 +19,16 @@ import { ExcelDownloadButton } from "@/components/ExcelDownloadButton";
 import type { PayrollLine } from "@/lib/types";
 
 const COLORS = [
-  "#0096d6",
+  "#007aff",
   "#c41e5a",
-  "#2ea36a",
-  "#e8912d",
-  "#7b5ea7",
-  "#0077b3",
-  "#e8c44a",
-  "#9b1848",
-  "#4db6ac",
-  "#f06292",
+  "#34c759",
+  "#ff9500",
+  "#af52de",
+  "#0096d6",
+  "#ffcc00",
+  "#ff3b30",
+  "#5ac8fa",
+  "#ff2d55",
 ];
 
 export default function ReportsPage() {
@@ -227,7 +227,7 @@ export default function ReportsPage() {
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tickFormatter={(v) => `${Math.round(v / 1000)}k`} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v) => formatBDTCurrency(Number(v || 0))} />
-                  <Bar dataKey="earned" stackId="a" fill="#0096d6" />
+                  <Bar dataKey="earned" stackId="a" fill="#007aff" />
                   <Bar dataKey="ot" stackId="a" fill="#c41e5a" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

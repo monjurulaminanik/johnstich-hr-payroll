@@ -1,25 +1,6 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
 import "./globals.css";
-
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const ibmMono = IBM_Plex_Mono({
-  variable: "--font-ibm-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
 
 export const metadata: Metadata = {
   title: "Jhonstitch HR & Payroll",
@@ -44,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${jakarta.variable} ${dmSans.variable} ${ibmMono.variable} antialiased`}>
+      <body className="antialiased">
         <AppShell>{children}</AppShell>
       </body>
     </html>

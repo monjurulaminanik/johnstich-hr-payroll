@@ -43,3 +43,5 @@ next-env.d.ts
 # local runtime database (seeded from Excel JSON on first run)
 /data/db.json
 /data/
+
+.vercel
