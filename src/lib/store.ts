@@ -356,11 +356,10 @@ export async function generatePayrollRun(periodId: string): Promise<PayrollRun> 
   await c.runs.replaceOne(
     { _id: periodId },
     {
-      _id: periodId,
       periodId,
       lines: run.lines,
       generatedAt: run.generatedAt,
-    },
+    } as PayrollRunDoc,
     { upsert: true }
   );
 

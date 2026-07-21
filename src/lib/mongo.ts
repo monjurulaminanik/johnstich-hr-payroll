@@ -90,7 +90,7 @@ export type PayrollRunDoc = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
+  // eslint-disable-next-line
   var __johnstichMongo: {
     client: MongoClient;
     db: Db;
@@ -161,6 +161,7 @@ export async function ensureIndexes() {
 }
 
 export function toEmployee(doc: EmployeeDoc): Employee {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _id, updatedAt: _u, ...rest } = doc;
   return { ...rest, id: _id };
 }
