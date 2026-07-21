@@ -216,7 +216,17 @@ export default function EmployeesPage() {
               </tr>
             </thead>
             <tbody>
-              {employees.map((emp) => (
+              {loading && (
+                <tr>
+                  <td colSpan={10}>
+                    <div className="empty-state">
+                      Loading Excel employee list… first compile can take up to a minute.
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {!loading &&
+                employees.map((emp) => (
                 <tr key={emp.id} style={{ opacity: emp.status === "inactive" ? 0.55 : 1 }}>
                   <td>{emp.cardNo}</td>
                   <td>
@@ -283,7 +293,9 @@ export default function EmployeesPage() {
               {!loading && employees.length === 0 && (
                 <tr>
                   <td colSpan={10}>
-                    <div className="empty-state">No employees match your filters.</div>
+                    <div className="empty-state">
+                      No employees found. Go to Settings → Reload Excel seed data.
+                    </div>
                   </td>
                 </tr>
               )}

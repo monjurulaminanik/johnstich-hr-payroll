@@ -20,23 +20,27 @@ export async function GET(req: NextRequest) {
   const action = searchParams.get("action");
 
   if (!periodId) {
-    return NextResponse.json({ periods: listPeriods() });
+    return NextResponse.json({ periods: await listPeriods(), storage: "mongodb" });
   }
 
-  const period = getPeriod(periodId);
+  const period = await getPeriod(periodId);
   if (!period) {
     return NextResponse.json({ error: "Period not found" }, { status: 404 });
   }
 
   if (action === "attendance") {
-    return NextResponse.json({ period, attendance: getAttendance(periodId) });
+    return NextResponse.json({
+      period,
+      attendance: await getAttendance(periodId),
+      storage: "mongodb",
+    });
   }
 
-  let run = getPayrollRun(periodId);
-  if (!run) run = generatePayrollRun(periodId);
+  let run = await getPayrollRun(periodId);
+  if (!run) run = await generatePayrollRun(periodId);
   const summary = summarizeLines(run.lines);
 
-  return NextResponse.json({ period, run, summary });
+  return NextResponse.json({ period, run, summary, storage: "mongodb" });
 }
 
 export async function POST(req: NextRequest) {
@@ -50,7 +54,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "year and month required" }, { status: 400 });
     }
     try {
-      const period = createPeriod({
+      const period = await createPeriod({
         label: periodLabel(year, month),
         year,
         month,
@@ -69,8 +73,8 @@ export async function POST(req: NextRequest) {
     const periodId = body.periodId as string;
     const entries = body.entries as AttendanceEntry[];
     try {
-      saveAttendance(periodId, entries);
-      const run = generatePayrollRun(periodId);
+      await saveAttendance(periodId, entries);
+      const run = await generatePayrollRun(periodId);
       return NextResponse.json({ ok: true, run, summary: summarizeLines(run.lines) });
     } catch (e) {
       return NextResponse.json(
@@ -81,13 +85,13 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "generate") {
-    const run = generatePayrollRun(body.periodId);
+    const run = await generatePayrollRun(body.periodId);
     return NextResponse.json({ run, summary: summarizeLines(run.lines) });
   }
 
   if (action === "finalize") {
     try {
-      const period = finalizePeriod(body.periodId);
+      const period = await finalizePeriod(body.periodId);
       return NextResponse.json({ period });
     } catch (e) {
       return NextResponse.json(

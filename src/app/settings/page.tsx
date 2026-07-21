@@ -12,6 +12,13 @@ export default function SettingsPage() {
   const [message, setMessage] = useState("");
   const [year, setYear] = useState(2026);
   const [month, setMonth] = useState(7);
+  const [health, setHealth] = useState<{
+    employees?: number;
+    wages?: number;
+    salary?: number;
+    attendance?: number;
+    database?: string;
+  } | null>(null);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -21,6 +28,7 @@ export default function SettingsPage() {
         setAllowances(d.allowances);
         setSettings(d.settings);
         setSections(d.sections || []);
+        setHealth(d.health || null);
       });
   }, []);
 
@@ -34,14 +42,19 @@ export default function SettingsPage() {
       body: JSON.stringify({ action: "reset-seed" }),
     });
     const data = await res.json();
-      setMessage(
-        `Reloaded ${data.employees} employees (Wages + Salary) and ${data.periods} period(s) from Excel.`
-      );
+    if (!res.ok) {
+      setMessage(data.error || "Seed failed");
+      return;
+    }
+    setMessage(
+      `MongoDB seeded: ${data.employees} employees, ${data.attendance} attendance rows, ${data.payrollLines} payroll lines (${data.periods} period). Storage: ${data.storage}.`
+    );
     const refreshed = await fetch("/api/settings").then((r) => r.json());
     setCompany(refreshed.company);
     setAllowances(refreshed.allowances);
     setSettings(refreshed.settings);
     setSections(refreshed.sections || []);
+    setHealth(refreshed.health || null);
   }
 
   async function createPeriod() {
@@ -77,6 +90,13 @@ export default function SettingsPage() {
       </div>
 
       {message && <div className="alert">{message}</div>}
+
+      {health && (
+        <div className="alert" style={{ marginBottom: "1rem" }}>
+          Storage: <strong>MongoDB</strong> · {health.employees} employees (
+          {health.wages} wages + {health.salary} salary) · {health.attendance} attendance rows
+        </div>
+      )}
 
       <div className="grid-2">
         <section className="panel">

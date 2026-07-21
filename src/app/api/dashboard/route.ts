@@ -1,28 +1,30 @@
 import { NextResponse } from "next/server";
 import {
-  getDb,
+  getDbSnapshot,
   listEmployees,
   listPeriods,
   getSections,
   generatePayrollRun,
   getPayrollRun,
+  mongoHealth,
 } from "@/lib/store";
 import { summarizeLines } from "@/lib/payroll";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const db = getDb();
-  const periods = listPeriods();
+  const db = await getDbSnapshot();
+  const periods = await listPeriods();
   const activePeriod = periods[0];
-  let run = activePeriod ? getPayrollRun(activePeriod.id) : undefined;
+  let run = activePeriod ? await getPayrollRun(activePeriod.id) : undefined;
   if (activePeriod && !run) {
-    run = generatePayrollRun(activePeriod.id);
+    run = await generatePayrollRun(activePeriod.id);
   }
 
-  const employees = listEmployees();
-  const sections = getSections();
+  const employees = await listEmployees();
+  const sections = await getSections();
   const summary = run ? summarizeLines(run.lines) : null;
+  const health = await mongoHealth();
 
   const attendanceRate =
     run && run.lines.length
@@ -36,6 +38,8 @@ export async function GET() {
   return NextResponse.json({
     company: db.company,
     period: activePeriod || null,
+    storage: "mongodb",
+    health,
     stats: {
       employees: employees.length,
       wagesCount,

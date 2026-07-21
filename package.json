@@ -7,10 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "verify": "node scripts/verify-payroll.mjs"
+    "verify": "node scripts/verify-payroll.mjs",
+    "verify:mongo": "node --env-file=.env.local scripts/verify-mongo.mjs",
+    "seed:mongo": "node --env-file=.env.local scripts/seed-mongo.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.511.0",
+    "mongodb": "^7.5.0",
     "next": "15.5.20",
     "react": "19.1.0",
     "react-dom": "19.1.0",

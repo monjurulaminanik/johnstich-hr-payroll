@@ -61,7 +61,21 @@ export default function DashboardPage() {
     );
   }
 
-  if (!data) return <div className="loading">Loading mill workforce summary…</div>;
+  if (!data) {
+    return (
+      <div className="loading" style={{ maxWidth: 420 }}>
+        <p style={{ marginBottom: 8, fontWeight: 600, color: "var(--ink)" }}>
+          Loading Excel payroll data…
+        </p>
+        <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: 1.45 }}>
+          First open can take up to a minute while the server compiles. After that,
+          open <strong>Employees</strong>, <strong>Payroll</strong>, or{" "}
+          <strong>Attendance</strong> in the sidebar to see the full Excel list
+          (202 people).
+        </p>
+      </div>
+    );
+  }
 
   const dash = data;
   const maxNet = Math.max(...dash.sectionBreakdown.map((s) => s.netPayable), 1);
@@ -115,6 +129,9 @@ export default function DashboardPage() {
         </div>
         <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
           <ExcelDownloadButton onClick={exportExcel} label="Download Excel" />
+          <Link href="/employees" className="btn btn-secondary">
+            All employees
+          </Link>
           <Link href="/attendance" className="btn btn-secondary">
             Edit attendance
           </Link>
@@ -122,6 +139,14 @@ export default function DashboardPage() {
             Open payroll <ArrowRight size={16} />
           </Link>
         </div>
+      </div>
+
+      <div className="alert" style={{ marginBottom: "1.1rem" }}>
+        MongoDB live: <strong>{dash.stats.employees} people</strong> (
+        {dash.stats.wagesCount} wages + {dash.stats.salaryCount} salary). Full tables →{" "}
+        <Link href="/employees">Employees</Link>,{" "}
+        <Link href="/payroll">Payroll</Link>,{" "}
+        <Link href="/attendance">Attendance</Link>.
       </div>
 
       <div className="stat-grid">

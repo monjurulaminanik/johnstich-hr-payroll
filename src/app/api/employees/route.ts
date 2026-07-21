@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { listEmployees, upsertEmployee, getEmployee, deleteEmployee } from "@/lib/store";
+import {
+  listEmployees,
+  upsertEmployee,
+  getEmployee,
+  deleteEmployee,
+} from "@/lib/store";
 import type { Employee } from "@/lib/types";
 import { slugId } from "@/lib/format";
 import { DEFAULT_ALLOWANCES } from "@/lib/payroll";
@@ -11,7 +16,7 @@ export async function GET(req: NextRequest) {
   const section = searchParams.get("section");
   const payType = searchParams.get("payType");
   const q = (searchParams.get("q") || "").toLowerCase();
-  let employees = listEmployees(true);
+  let employees = await listEmployees(true);
 
   if (section) employees = employees.filter((e) => e.section === section);
   if (payType === "wages" || payType === "salary") {
@@ -27,7 +32,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ employees });
+  return NextResponse.json({ employees, storage: "mongodb" });
 }
 
 export async function POST(req: NextRequest) {
@@ -63,7 +68,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name and section are required" }, { status: 400 });
   }
 
-  upsertEmployee(employee);
+  await upsertEmployee(employee);
   return NextResponse.json({ employee });
 }
 
@@ -72,7 +77,7 @@ export async function PATCH(req: NextRequest) {
   if (!body.id) {
     return NextResponse.json({ error: "id required" }, { status: 400 });
   }
-  const existing = getEmployee(body.id);
+  const existing = await getEmployee(body.id);
   if (!existing) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -84,7 +89,7 @@ export async function PATCH(req: NextRequest) {
     conveyance: body.conveyance !== undefined ? Number(body.conveyance) : existing.conveyance,
     food: body.food !== undefined ? Number(body.food) : existing.food,
   };
-  upsertEmployee(employee);
+  await upsertEmployee(employee);
   return NextResponse.json({ employee });
 }
 
@@ -92,6 +97,6 @@ export async function DELETE(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
-  deleteEmployee(id);
+  await deleteEmployee(id);
   return NextResponse.json({ ok: true });
 }
