@@ -1,19 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, parseSession } from "@/lib/auth";
+import { SESSION_COOKIE } from "@/lib/auth";
+import { resolveSession } from "@/lib/session";
 
 const PUBLIC = ["/login", "/api/auth"];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const session = parseSession(request.cookies.get(SESSION_COOKIE)?.value);
+  const isApi = pathname.startsWith("/api/");
 
-  if (pathname === "/login") {
-    if (session) return NextResponse.redirect(new URL("/", request.url));
+  if (PUBLIC.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
-  if (PUBLIC.some((p) => pathname.startsWith(p))) {
+  const session = await resolveSession(request);
+
+  if (isApi) {
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname === "/login") {
+    if (session) return NextResponse.redirect(new URL("/", request.url));
     return NextResponse.next();
   }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DEMO_ADMIN, SESSION_COOKIE, isValidCredentials } from "@/lib/auth";
+import { signMobileToken } from "@/lib/jwt";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -16,7 +17,9 @@ export async function POST(req: NextRequest) {
     role: DEMO_ADMIN.role,
   };
 
-  const res = NextResponse.json({ ok: true, user: session });
+  const token = await signMobileToken(session);
+
+  const res = NextResponse.json({ ok: true, user: session, token });
   res.cookies.set(SESSION_COOKIE, JSON.stringify(session), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

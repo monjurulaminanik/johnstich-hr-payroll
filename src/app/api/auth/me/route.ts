@@ -1,10 +1,9 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { SESSION_COOKIE, parseSession } from "@/lib/auth";
+import type { NextRequest } from "next/server";
+import { resolveSession } from "@/lib/session";
 
-export async function GET() {
-  const jar = await cookies();
-  const user = parseSession(jar.get(SESSION_COOKIE)?.value);
+export async function GET(req: NextRequest) {
+  const user = await resolveSession(req);
   if (!user) return NextResponse.json({ user: null }, { status: 401 });
   return NextResponse.json({ user });
 }
