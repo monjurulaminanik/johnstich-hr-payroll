@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -12,8 +12,10 @@ import {
   Settings,
   Menu,
   X,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -24,9 +26,48 @@ const NAV = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
+interface User {
+  email: string;
+  name: string;
+  role: string;
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [userOpen, setUserOpen] = useState(false);
+  const [headcount, setHeadcount] = useState("202");
+
+  useEffect(() => {
+    if (pathname === "/login") return;
+    fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setUser(d.user));
+    fetch("/api/dashboard")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.stats?.employees && setHeadcount(String(d.stats.employees)));
+  }, [pathname]);
+
+  if (pathname === "/login") {
+    return <>{children}</>;
+  }
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "AD";
 
   return (
     <div className="app-shell">
@@ -70,8 +111,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className={`nav-link ${active ? "active" : ""}`}
                 onClick={() => setOpen(false)}
               >
-                <Icon size={20} strokeWidth={1.6} />
+                <span className="nav-icon-wrap">
+                  <Icon size={19} strokeWidth={1.75} />
+                </span>
                 <span>{item.label}</span>
+                {active && <span className="nav-active-dot" />}
               </Link>
             );
           })}
@@ -126,7 +170,45 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <strong>People & Pay</strong>
             </div>
           </div>
-          <div className="topbar-pill">202 people</div>
+
+          <div className="topbar-actions">
+            <div className="topbar-pill">
+              <span className="topbar-pill-dot" />
+              {headcount} people · Live
+            </div>
+
+            <div className="user-menu">
+              <button
+                type="button"
+                className="user-menu-btn"
+                onClick={() => setUserOpen((v) => !v)}
+                aria-expanded={userOpen}
+              >
+                <span className="user-avatar">{initials}</span>
+                <span className="user-info">
+                  <strong>{user?.name || "Admin"}</strong>
+                  <small>{user?.email || "admin@gmail.com"}</small>
+                </span>
+                <ChevronDown size={16} className={userOpen ? "rotated" : ""} />
+              </button>
+              {userOpen && (
+                <>
+                  <button
+                    type="button"
+                    className="user-menu-backdrop"
+                    onClick={() => setUserOpen(false)}
+                    aria-label="Close menu"
+                  />
+                  <div className="user-dropdown">
+                    <button type="button" className="user-dropdown-item" onClick={logout}>
+                      <LogOut size={16} />
+                      Sign out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </header>
         <main className="page-content">{children}</main>
       </div>
